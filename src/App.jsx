@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 
 const ROUNDS = 12;
-const ROUND_LENGTH = 5;
-const INTERVAL_LENGTH = 5;
+const ROUND_LENGTH = 180;
+const INTERVAL_LENGTH = 60;
 
 function App() {
 
@@ -10,30 +10,42 @@ function App() {
     const [isRunning, setIsRunning] = useState(false);
     const [round, setRound] = useState(1);
     const [type, setType] = useState("ROUND");
-    const [bell, setBell] = useState(null);
+    const [oneBell, setOneBell] = useState(null);
+    const [threeBell, setThreeBell] = useState(null);
+    const [warn, setWarn] = useState(null);
     
     useEffect(() => {
-        const newAudio = new Audio('bell3.m4a');
-        newAudio.load();
-        setBell(newAudio);
+        const newOneBell = new Audio('bell1.mp3');
+        const newThreeBell = new Audio('bell3.mp3')
+        const newWarn = new Audio('warning.mp3');
+        newOneBell.load();
+        newThreeBell.load();
+        newWarn.load();
+        setOneBell(newOneBell);
+        setThreeBell(newThreeBell);
+        setWarn(newWarn);
     },[]);
 
     useEffect(() => {
         if (isRunning) {
             const intervalId = setInterval(() => setTime(time - 1), 1000);
 
+            if(time === 10) {
+                warn.play();
+            }
+
             if(time === 0) {
                 if(type === 'ROUND') {
                     if(round === ROUNDS) {
                         reset();
                     } else {
-                        bell.play();
+                        threeBell.play();
                         setType("INTERVAL");
                         setTime(INTERVAL_LENGTH);
                         
                     }
                 } else if (type === 'INTERVAL') {
-                    bell.play();
+                    oneBell.play();
                     setType("ROUND");
                     setTime(ROUND_LENGTH);
                     setRound(round + 1);
@@ -54,7 +66,7 @@ function App() {
 
     function startStop() {
         if(type === 'ROUND' && round === 1 && time === ROUND_LENGTH) {
-            bell.play();
+            oneBell.play();
         }
         setIsRunning(!isRunning);
     }
